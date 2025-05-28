@@ -1,31 +1,64 @@
 import { JwtPayload, jwtDecode } from 'jwt-decode';
 
+interface User {
+  id: number;
+  username: string;
+}
+
 class AuthService {
-  getProfile() {
-    // TODO: return the decoded token
+  private static TOKEN_KEY = 'auth_token';
+
+  static getToken(): string | null {
+    return localStorage.getItem(this.TOKEN_KEY);
   }
 
-  loggedIn() {
-    // TODO: return a value that indicates if the user is logged in
-  }
-  
-  isTokenExpired(token: string) {
-    // TODO: return a value that indicates if the token is expired
+  static setToken(token: string): void {
+    localStorage.setItem(this.TOKEN_KEY, token);
   }
 
-  getToken(): string {
-    // TODO: return the token
+  static removeToken(): void {
+    localStorage.removeItem(this.TOKEN_KEY);
   }
 
-  login(idToken: string) {
-    // TODO: set the token to localStorage
-    // TODO: redirect to the home page
+  static isAuthenticated(): boolean {
+    const token = this.getToken();
+    if (!token) return false;
+    
+    try {
+      const decoded = jwtDecode<JwtPayload>(token);
+      return decoded.exp ? decoded.exp * 1000 > Date.now() : false;
+    } catch {
+      return false;
+    }
   }
 
-  logout() {
-    // TODO: remove the token from localStorage
-    // TODO: redirect to the login page
+  static getAuthHeader(): { Authorization: string } | Record<string, never> {
+    const token = this.getToken();
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  }
+
+  static getProfile(): User | null {
+    const token = this.getToken();
+    if (!token) return null;
+    
+    try {
+      const decoded = jwtDecode<JwtPayload & User>(token);
+      return {
+        id: decoded.id,
+        username: decoded.username
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  static login(token: string): void {
+    this.setToken(token);
+  }
+
+  static logout(): void {
+    this.removeToken();
   }
 }
 
-export default new AuthService();
+export default AuthService;

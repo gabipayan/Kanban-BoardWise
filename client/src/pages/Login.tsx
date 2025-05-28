@@ -1,55 +1,61 @@
-import { useState, FormEvent, ChangeEvent } from "react";
-
-import Auth from '../utils/auth';
-import { login } from "../api/authAPI";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { login } from '../api/authAPI';
+import viteLogo from '/vite.svg';
 
 const Login = () => {
-  const [loginData, setLoginData] = useState({
-    username: '',
-    password: ''
-  });
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setLoginData({
-      ...loginData,
-      [name]: value
-    });
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+
     try {
-      const data = await login(loginData);
-      Auth.login(data.token);
+      await login(username, password);
+      navigate('/');
     } catch (err) {
-      console.error('Failed to login', err);
+      setError('Invalid username or password');
     }
   };
 
   return (
     <div className='container'>
+      <div className='login-header'>
+        <img src={viteLogo} alt="Kanban Board Logo" className='login-logo' />
+        <h1 className='login-title'>Kanban Board</h1>
+      </div>
       <form className='form' onSubmit={handleSubmit}>
-        <h1>Login</h1>
-        <label >Username</label>
-        <input 
-          type='text'
+        <h2>Login</h2>
+        
+        <label htmlFor='username'>Username</label>
+        <input
+          id='username'
           name='username'
-          value={loginData.username || ''}
-          onChange={handleChange}
+          type='text'
+          required
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
         />
-      <label>Password</label>
-        <input 
-          type='password'
+
+        <label htmlFor='password'>Password</label>
+        <input
+          id='password'
           name='password'
-          value={loginData.password || ''}
-          onChange={handleChange}
+          type='password'
+          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
         />
-        <button type='submit'>Submit Form</button>
+
+        {error && <div className='error-message'>{error}</div>}
+
+        <button type='submit'>Sign In</button>
       </form>
     </div>
-    
-  )
+  );
 };
 
 export default Login;
