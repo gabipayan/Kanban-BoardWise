@@ -1,17 +1,25 @@
-import axios from 'axios';
-import { UserData } from '../interfaces/UserData';
-import AuthService from '../utils/auth';
+import Auth from '../utils/auth';
 
-const API_URL = 'http://localhost:3001/api';
-
-export const retrieveUsers = async (): Promise<UserData[]> => {
+const retrieveUsers = async () => {
   try {
-    const response = await axios.get(`${API_URL}/users`, {
-      headers: AuthService.getAuthHeader()
+    const response = await fetch('/api/users', {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${Auth.getToken()}`
+      }
     });
-    return response.data;
-  } catch (error) {
-    console.error('Error retrieving users:', error);
-    throw error;
+    const data = await response.json();
+
+    if(!response.ok) {
+      throw new Error('invalid user API response, check network tab!');
+    }
+
+    return data;
+
+  } catch (err) { 
+    console.log('Error from data retrieval:', err);
+    return [];
   }
-};
+}
+
+export { retrieveUsers };
