@@ -4,6 +4,7 @@ import { User } from '../models/user.js';
 
 // GET /tickets
 export const getAllTickets = async (_req: Request, res: Response) => {
+  console.log("HIT all tickets endpoint");
   try {
     const tickets = await Ticket.findAll({
       include: [
@@ -14,9 +15,10 @@ export const getAllTickets = async (_req: Request, res: Response) => {
         },
       ],
     });
-    res.json(tickets);
+    return res.json(tickets);
   } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    console.error('Error fetching tickets:', error);
+    return res.status(500).json({ message: error.message });
   }
 };
 

@@ -9,7 +9,7 @@ const retrieveTickets = async () => {
       {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${Auth.getToken()}`
+          'Authorization': `Bearer ${Auth.getToken()}`
         }
       }
     );
