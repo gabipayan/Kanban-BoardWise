@@ -19,6 +19,7 @@ const Login = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    console.log('Login data:', loginData); // <-- para verificar que los datos están bien
     try {
       const data = await login(loginData);
       Auth.login(data.token);

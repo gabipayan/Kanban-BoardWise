@@ -3,8 +3,42 @@ import jwt from 'jsonwebtoken';
 
 interface JwtPayload {
   username: string;
+  id: number;
 }
 
-export const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
+// Middleware para autenticar token
+export const authenticateToken = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
   // TODO: verify the token exists and add the user data to the request object
+  //const authHeader = req.headers['Authorization'];
+  const authHeader = req.headers['authorization'];
+
+  if (!authHeader) {
+    console.log('❌ No Authorization header');
+    res.status(401).json({ message: 'Unauthorized: No token provided' });
+    return;
+  }
+
+  const token = authHeader.split(' ')[1]; // Bearer <token>
+
+  if (!token) {
+    console.log('❌ Token not found');
+    res.status(401).json({ message: 'Unauthorized: Invalid token format' });
+    return;
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET_KEY || '', (err, user) => {
+    if (err || !user) {
+      console.log('❌ Token verification failed');
+      res.status(403).json({ message: 'Forbidden: Invalid token' });
+      return;
+    }
+
+    console.log('✅ Token validated:', user);
+    (req as any).user = user as JwtPayload;
+    next(); // Todo bien, pasamos al siguiente middleware
+  });
 };
