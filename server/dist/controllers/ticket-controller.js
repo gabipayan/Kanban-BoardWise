@@ -9,7 +9,7 @@ export const getAllTickets = async (_req, res) => {
                 {
                     model: User,
                     as: 'assignedUser', // This should match the alias defined in the association
-                    attributes: ['username'], // Including only the username attribute
+                    attributes: ['username'], // Include only the username attribute
                 },
             ],
         });
@@ -29,7 +29,7 @@ export const getTicketById = async (req, res) => {
                 {
                     model: User,
                     as: 'assignedUser', // This should match the alias defined in the association
-                    attributes: ['username'], // Including only the username attribute
+                    attributes: ['username'], // Include only the username attribute
                 },
             ],
         });
